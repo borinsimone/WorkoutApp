@@ -1,0 +1,51 @@
+:root {
+  --bg: #f7f3ea;
+  --ink: #1b1b1b;
+  --accent: #1d4ed8;
+  --card: #ffffff;
+  --border: #e6dfd1;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  font-family: 'Georgia', 'Times New Roman', serif;
+  color: var(--ink);
+  background: radial-gradient(circle at top, #fff7e8, var(--bg));
+}
+
+a {
+  color: var(--accent);
+}
+
+.container {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 40px 20px;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  padding: 32px;
+  max-width: 560px;
+  border-radius: 16px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+}
+
+h1 {
+  margin: 0 0 12px 0;
+  font-size: 40px;
+  letter-spacing: -0.5px;
+}
+
+p {
+  margin: 8px 0;
+  line-height: 1.5;
+}
