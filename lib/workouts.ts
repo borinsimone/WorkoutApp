@@ -15,7 +15,7 @@ export interface Exercise {
 }
 
 // In-memory storage
-let workouts: Workout[] = [
+const workouts: Workout[] = [
   {
     id: '1',
     name: 'Upper Body Workout',

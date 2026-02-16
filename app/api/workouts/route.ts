@@ -5,7 +5,7 @@ export async function GET() {
   try {
     const workouts = getAllWorkouts();
     return NextResponse.json(workouts);
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'Failed to fetch workouts' },
       { status: 500 }
@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json(workout, { status: 201 });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'Failed to create workout' },
       { status: 500 }

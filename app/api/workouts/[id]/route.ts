@@ -21,7 +21,7 @@ export async function GET(
     }
 
     return NextResponse.json(workout);
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'Failed to fetch workout' },
       { status: 500 }
@@ -45,7 +45,7 @@ export async function DELETE(
     }
 
     return NextResponse.json({ message: 'Workout deleted successfully' });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'Failed to delete workout' },
       { status: 500 }
