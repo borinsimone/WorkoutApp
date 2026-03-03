@@ -2,6 +2,8 @@
 
 .tabPage {
   @include tab.tab-page-base;
+  display: grid;
+  gap: 14px;
 }
 
 .tabTitle {
@@ -12,8 +14,433 @@
   @include tab.tab-subtitle;
 }
 
+.weekCard,
+.stateCard,
+.editorCard,
+.analyticsCard {
+  border-radius: 20px;
+  border: 1px solid rgba(110, 210, 174, 0.16);
+  background: rgba(14, 54, 76, 0.54);
+  padding: 14px;
+}
+
+.weekTopBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.weekSwitch {
+  border: none;
+  border-radius: 999px;
+  padding: 8px 10px;
+  background: rgba(88, 217, 165, 0.12);
+  color: rgba(99, 227, 170, 0.92);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.weekRangeLabel {
+  margin: 0;
+  color: rgba(201, 212, 219, 0.86);
+  font-size: 13px;
+}
+
+.weekGrid {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.dayCell {
+  border: none;
+  border-radius: 14px;
+  padding: 10px 4px;
+  display: grid;
+  place-items: center;
+  gap: 3px;
+  color: rgba(201, 212, 219, 0.88);
+  background: rgba(14, 26, 41, 0.5);
+  cursor: pointer;
+}
+
+.daySelected {
+  outline: 1px solid rgba(99, 227, 170, 0.72);
+}
+
+.statusCompleted {
+  background: rgba(83, 209, 155, 0.22);
+}
+
+.statusInProgress {
+  background: rgba(104, 158, 255, 0.25);
+}
+
+.statusPlanned {
+  background: rgba(255, 208, 117, 0.2);
+}
+
+.statusNone {
+  background: rgba(24, 38, 54, 0.64);
+}
+
+.dayName {
+  font-size: 11px;
+  color: rgba(171, 196, 209, 0.86);
+}
+
+.dayNumber {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.stateHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.stateDate {
+  margin: 0;
+  text-transform: capitalize;
+  color: rgba(171, 196, 209, 0.8);
+  font-size: 13px;
+}
+
+.stateTitle {
+  margin: 5px 0 0;
+  font-size: 20px;
+  color: #c9d4db;
+}
+
+.statusBadge {
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(88, 217, 165, 0.12);
+  color: rgba(99, 227, 170, 0.92);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.timerCard {
+  margin-top: 12px;
+  border-radius: 16px;
+  background: rgba(8, 28, 43, 0.65);
+  border: 1px solid rgba(110, 210, 174, 0.16);
+  padding: 12px;
+}
+
+.timerLabel {
+  margin: 0;
+  font-size: 12px;
+  color: rgba(171, 196, 209, 0.74);
+}
+
+.timerValue {
+  margin: 4px 0 0;
+  color: #c9d4db;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.timerActions {
+  margin-top: 10px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.pillButton {
+  border: none;
+  border-radius: 999px;
+  padding: 6px 10px;
+  background: rgba(88, 217, 165, 0.12);
+  color: rgba(99, 227, 170, 0.9);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.sectionBlock {
+  margin-top: 12px;
+  border-top: 1px solid rgba(188, 220, 234, 0.1);
+  padding-top: 12px;
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: rgba(171, 201, 216, 0.76);
+}
+
+.exerciseCard {
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 14px;
+  background: rgba(8, 28, 43, 0.56);
+  border: 1px solid rgba(120, 196, 224, 0.14);
+}
+
+.exerciseTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.exerciseName {
+  margin: 0;
+  color: rgba(201, 212, 219, 0.96);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.linkButton {
+  border: none;
+  border-radius: 999px;
+  padding: 5px 8px;
+  background: rgba(104, 158, 255, 0.2);
+  color: rgba(169, 200, 255, 0.98);
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.setRow {
+  margin-top: 8px;
+  display: grid;
+  grid-template-columns: 54px repeat(3, minmax(0, 1fr)) 66px;
+  gap: 6px;
+  align-items: center;
+}
+
+.setIndex {
+  font-size: 12px;
+  color: rgba(171, 196, 209, 0.82);
+}
+
+.setInput,
+.setInputWide,
+.textInput,
+.textArea,
+.selectInput {
+  border: 1px solid rgba(168, 199, 214, 0.22);
+  border-radius: 10px;
+  background: rgba(10, 24, 38, 0.6);
+  color: #c9d4db;
+  padding: 8px;
+  font-size: 13px;
+}
+
+.setInput {
+  width: 100%;
+}
+
+.setInputWide {
+  grid-column: span 3;
+}
+
+.doneButton {
+  border: none;
+  border-radius: 10px;
+  background: rgba(64, 78, 93, 0.52);
+  color: rgba(194, 208, 217, 0.9);
+  height: 34px;
+  cursor: pointer;
+}
+
+.doneActive {
+  background: rgba(76, 207, 151, 0.24);
+  color: rgba(99, 227, 170, 0.98);
+}
+
+.primaryActions {
+  margin-top: 12px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.primaryButton,
+.secondaryButton {
+  border: none;
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.primaryButton {
+  background: rgba(88, 217, 165, 0.2);
+  color: rgba(99, 227, 170, 0.98);
+}
+
+.secondaryButton {
+  background: rgba(66, 87, 103, 0.5);
+  color: rgba(202, 214, 221, 0.96);
+}
+
+.infoStack {
+  margin-top: 12px;
+  display: grid;
+  gap: 8px;
+}
+
+.infoLine {
+  margin: 0;
+  color: rgba(201, 212, 219, 0.92);
+  line-height: 1.4;
+}
+
+.previewSection {
+  border-radius: 12px;
+  border: 1px solid rgba(146, 182, 201, 0.18);
+  background: rgba(10, 24, 38, 0.52);
+  padding: 10px;
+}
+
+.previewTitle {
+  margin: 0;
+  font-size: 12px;
+  color: rgba(171, 196, 209, 0.75);
+  text-transform: uppercase;
+}
+
+.previewValue {
+  margin: 5px 0 0;
+  color: rgba(201, 212, 219, 0.95);
+  font-size: 13px;
+}
+
+.comingSoon {
+  margin-top: 8px;
+  border-radius: 12px;
+  border: 1px dashed rgba(137, 160, 176, 0.42);
+  padding: 10px;
+  color: rgba(171, 196, 209, 0.78);
+  font-size: 12px;
+}
+
+.cardTitle {
+  margin: 0 0 10px;
+  color: #c9d4db;
+  font-size: 16px;
+}
+
+.textInput,
+.textArea,
+.selectInput {
+  width: 100%;
+}
+
+.textArea {
+  min-height: 72px;
+  resize: vertical;
+  margin-top: 8px;
+}
+
+.inlineEditor {
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: 1fr 140px auto;
+  gap: 8px;
+}
+
+.badgeList {
+  margin-top: 10px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.badge {
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 12px;
+  background: rgba(88, 217, 165, 0.12);
+  color: rgba(99, 227, 170, 0.92);
+}
+
+.copyBlock {
+  display: grid;
+  gap: 8px;
+}
+
+.copyTitle {
+  margin: 4px 0 0;
+  color: rgba(171, 196, 209, 0.8);
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.copyEmpty {
+  margin: 0;
+  color: rgba(171, 196, 209, 0.7);
+  font-size: 13px;
+}
+
+.copyRow {
+  border: none;
+  border-radius: 12px;
+  background: rgba(10, 24, 38, 0.52);
+  border: 1px solid rgba(146, 182, 201, 0.16);
+  color: rgba(201, 212, 219, 0.95);
+  padding: 9px 10px;
+  font-size: 13px;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  cursor: pointer;
+}
+
 @media (max-width: 480px) {
+  .tabPage {
+    gap: 12px;
+  }
+
   .tabSubtitle {
     @include tab.tab-subtitle-mobile;
+  }
+
+  .weekCard,
+  .stateCard,
+  .editorCard,
+  .analyticsCard {
+    border-radius: 18px;
+    padding: 12px;
+  }
+
+  .weekTopBar {
+    flex-wrap: wrap;
+  }
+
+  .weekSwitch {
+    font-size: 11px;
+  }
+
+  .weekGrid {
+    gap: 5px;
+  }
+
+  .dayCell {
+    border-radius: 12px;
+    padding: 8px 4px;
+  }
+
+  .stateTitle {
+    font-size: 18px;
+  }
+
+  .setRow {
+    grid-template-columns: 46px repeat(3, minmax(0, 1fr)) 62px;
+  }
+
+  .inlineEditor {
+    grid-template-columns: 1fr;
   }
 }
