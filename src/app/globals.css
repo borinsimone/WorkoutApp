@@ -31,18 +31,23 @@ body {
   display: flex;
   justify-content: center;
   align-items: flex-start;
+
   /* padding: 14px; */
 }
-
-.home {
+section {
+  height: 100vh;
+  height: 100dvh;
   width: min(100%, 520px);
 }
+/* .home {
+} */
 
 .phone-shell {
   position: relative;
   isolation: isolate;
   width: 100%;
-  height: clamp(620px, calc(100vh - 28px), 980px);
+  height: 100vh;
+  height: 100dvh;
   border-radius: 0;
   padding: 0;
   background: transparent;
@@ -55,6 +60,7 @@ body {
   z-index: 0;
   inset: 0;
   border-radius: 0;
+
   background:
     radial-gradient(
       circle at 82% 8%,
@@ -72,7 +78,8 @@ body {
 .tab-content {
   position: relative;
   z-index: 1;
-  min-height: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
   padding: 28px 22px 116px;
 }
 
@@ -187,7 +194,8 @@ body {
   }
 
   .phone-shell {
-    height: clamp(560px, calc(100vh - 24px), 860px);
+    height: 100vh;
+    height: 100dvh;
   }
 
   .bottom-nav {
@@ -213,7 +221,8 @@ body {
   }
 
   .phone-shell {
-    height: calc(100vh - 16px);
+    height: 100vh;
+    height: 100dvh;
   }
 
   .tab-content {
