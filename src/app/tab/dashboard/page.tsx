@@ -1,11 +1,13 @@
+import styles from './styles/page.module.scss';
+
 export default function DashboardPage() {
   return (
     <section
-      className='tab-page'
+      className={styles.tabPage}
       aria-label='Dashboard'
     >
-      <h1 className='tab-title'>Dashboard</h1>
-      <p className='tab-subtitle'>
+      <h1 className={styles.tabTitle}>Dashboard</h1>
+      <p className={styles.tabSubtitle}>
         Panoramica rapida delle metriche e progressi.
       </p>
     </section>

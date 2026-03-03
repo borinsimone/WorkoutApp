@@ -2,6 +2,7 @@
 
 import { usePathname, useRouter } from 'next/navigation';
 import type { CSSProperties, ReactNode } from 'react';
+import styles from './styles/layout.module.scss';
 
 const tabs = [
   {
@@ -68,14 +69,14 @@ export default function TabLayout({ children }: { children: ReactNode }) {
   );
 
   return (
-    <section className='home'>
-      <div className='phone-shell'>
-        <div className='phone-gradient' />
+    <section className={styles.home}>
+      <div className={styles.phoneShell}>
+        <div className={styles.phoneGradient} />
 
-        <div className='tab-content'>{children}</div>
+        <div className={styles.tabContent}>{children}</div>
 
         <nav
-          className='bottom-nav'
+          className={styles.bottomNav}
           aria-label='Navigazione principale'
           style={{ '--active-index': activeIndex } as CSSProperties}
         >
@@ -86,7 +87,7 @@ export default function TabLayout({ children }: { children: ReactNode }) {
               <button
                 key={tab.id}
                 type='button'
-                className={`nav-item${isActive ? ' is-active' : ''}`}
+                className={`${styles.navItem} ${isActive ? styles.isActive : ''}`}
                 aria-label={tab.label}
                 aria-current={isActive ? 'page' : undefined}
                 aria-pressed={isActive}

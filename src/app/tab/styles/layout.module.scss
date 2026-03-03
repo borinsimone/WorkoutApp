@@ -1,0 +1,187 @@
+.home {
+  height: 100vh;
+  height: 100dvh;
+  width: min(100%, 520px);
+}
+
+.phoneShell {
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  border-radius: 0;
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+  overflow: hidden;
+}
+
+.phoneGradient {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  border-radius: 0;
+  background:
+    radial-gradient(
+      circle at 82% 8%,
+      rgba(107, 255, 192, 0.7),
+      rgba(0, 0, 0, 0) 25%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(5, 56, 79, 0.95) 0%,
+      rgba(3, 25, 43, 0.96) 48%,
+      rgba(0, 0, 0, 1) 100%
+    );
+}
+
+.tabContent {
+  position: relative;
+  z-index: 1;
+  height: 100vh;
+  height: 100dvh;
+  padding: 28px 22px 116px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.bottomNav {
+  --active-index: 1;
+  --nav-side-pad: 6px;
+  --tab-count: 4;
+  position: absolute;
+  z-index: 10;
+  left: 22px;
+  right: 22px;
+  bottom: 18px;
+  height: 86px;
+  border-radius: 38px;
+  background: rgba(19, 69, 95, 0.95);
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 var(--nav-side-pad);
+
+  &::before {
+    content: '';
+    position: absolute;
+    z-index: 0;
+    top: 50%;
+    left: calc(
+      var(--nav-side-pad) +
+        ((100% - (var(--nav-side-pad) * 2)) / var(--tab-count)) *
+        (var(--active-index) + 0.5)
+    );
+    width: 64px;
+    height: 64px;
+    border-radius: 22px;
+    background: rgba(100, 244, 181, 0.12);
+    box-shadow:
+      0 0 24px rgba(98, 237, 175, 0.5),
+      0 0 38px rgba(74, 219, 162, 0.24);
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    transition:
+      left 360ms cubic-bezier(0.22, 1, 0.36, 1),
+      width 240ms ease,
+      height 240ms ease;
+  }
+}
+
+.navItem {
+  position: relative;
+  z-index: 11;
+  display: inline-grid;
+  width: 64px;
+  height: 64px;
+  border-radius: 22px;
+  border: none;
+  background: transparent;
+  color: rgba(87, 211, 162, 0.72);
+  place-items: center;
+  padding: 0;
+  transform: scale(0.96);
+  transition:
+    color 220ms ease,
+    transform 220ms ease,
+    opacity 220ms ease;
+  opacity: 0.92;
+  cursor: pointer;
+
+  svg {
+    width: 38px;
+    height: 38px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 1.9;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: transform 220ms ease;
+  }
+}
+
+.isActive {
+  color: var(--mint);
+  opacity: 1;
+  transform: scale(1);
+
+  svg {
+    transform: scale(1.04);
+  }
+}
+
+@media (max-width: 768px) {
+  .bottomNav {
+    left: 20px;
+    right: 20px;
+    height: 82px;
+
+    &::before {
+      width: 60px;
+      height: 60px;
+    }
+  }
+
+  .navItem {
+    width: 60px;
+    height: 60px;
+  }
+}
+
+@media (max-width: 480px) {
+  .home {
+    width: 100%;
+  }
+
+  .tabContent {
+    padding: 22px 16px 108px;
+  }
+
+  .bottomNav {
+    left: 16px;
+    right: 16px;
+    bottom: 14px;
+    height: 78px;
+    border-radius: 32px;
+
+    &::before {
+      width: 56px;
+      height: 56px;
+      border-radius: 18px;
+    }
+  }
+
+  .navItem {
+    width: 56px;
+    height: 56px;
+    border-radius: 18px;
+
+    svg {
+      width: 34px;
+      height: 34px;
+    }
+  }
+}

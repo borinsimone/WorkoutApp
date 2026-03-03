@@ -1,4 +1,4 @@
-import './globals.css';
+import './styles/globals.scss';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -14,7 +14,7 @@ export default function RootLayout({
   return (
     <html lang='it'>
       <body>
-        <main className='container'>{children}</main>
+        <main className='appContainer'>{children}</main>
       </body>
     </html>
   );

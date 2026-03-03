@@ -1,0 +1,19 @@
+@use '../../styles/tab-page' as tab;
+
+.tabPage {
+  @include tab.tab-page-base;
+}
+
+.tabTitle {
+  @include tab.tab-title;
+}
+
+.tabSubtitle {
+  @include tab.tab-subtitle;
+}
+
+@media (max-width: 480px) {
+  .tabSubtitle {
+    @include tab.tab-subtitle-mobile;
+  }
+}

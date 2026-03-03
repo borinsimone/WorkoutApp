@@ -1,0 +1,34 @@
+:root {
+  --bg: #1f2127;
+  --ink: #9ea0aa;
+  --mint: #63e3aa;
+  --mint-soft: #57d3a2;
+  --nav-bg: #11425b;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  font-family:
+    Inter,
+    system-ui,
+    -apple-system,
+    Segoe UI,
+    Roboto,
+    sans-serif;
+  color: var(--ink);
+  background: var(--bg);
+}
+
+.appContainer {
+  height: 100vh;
+  height: 100dvh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
