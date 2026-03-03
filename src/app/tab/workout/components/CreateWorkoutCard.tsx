@@ -40,16 +40,16 @@ export function CreateWorkoutCard({
 
   return (
     <article className={styles.editorCard}>
-      <h3 className={styles.cardTitle}>Crea workout da zero</h3>
+      <h3 className={styles.cardTitle}>Crea allenamento da zero</h3>
       <input
         className={styles.textInput}
-        placeholder='Nome workout'
+        placeholder='Nome allenamento'
         value={draftName}
         onChange={(event) => setDraftName(event.target.value)}
       />
       <textarea
         className={styles.textArea}
-        placeholder='Note workout'
+        placeholder='Note allenamento'
         value={draftNotes}
         onChange={(event) => setDraftNotes(event.target.value)}
       />
@@ -86,7 +86,8 @@ export function CreateWorkoutCard({
             key={exercise.id}
             className={styles.badge}
           >
-            {exercise.name} · {exercise.metricType === 'time' ? 'Tempo' : 'Kg/Reps'}
+            {exercise.name} ·{' '}
+            {exercise.metricType === 'time' ? 'Tempo' : 'Kg/Reps'}
           </span>
         ))}
       </div>

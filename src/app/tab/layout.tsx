@@ -7,7 +7,7 @@ import styles from './styles/layout.module.scss';
 const tabs = [
   {
     id: 'dashboard',
-    label: 'Dashboard',
+    label: 'Panoramica',
     href: '/tab/dashboard',
     icon: (
       <svg
@@ -33,7 +33,7 @@ const tabs = [
   },
   {
     id: 'community',
-    label: 'Community',
+    label: 'Comunità',
     href: '/tab/community',
     icon: (
       <svg

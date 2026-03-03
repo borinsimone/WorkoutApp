@@ -4,9 +4,9 @@ export default function SettingsPage() {
   return (
     <section
       className={styles.tabPage}
-      aria-label='Settings'
+      aria-label='Impostazioni'
     >
-      <h1 className={styles.tabTitle}>Settings</h1>
+      <h1 className={styles.tabTitle}>Impostazioni</h1>
       <p className={styles.tabSubtitle}>Preferenze app, account e notifiche.</p>
 
       <div className={styles.settingsStack}>
@@ -65,7 +65,7 @@ export default function SettingsPage() {
               </span>
             </span>
             <span className={`${styles.settingsPill} ${styles.isMuted}`}>
-              Off
+              Disattive
             </span>
           </div>
         </article>

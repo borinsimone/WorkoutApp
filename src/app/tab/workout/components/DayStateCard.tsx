@@ -47,7 +47,9 @@ export function DayStateCard({
       <div className={styles.stateHeader}>
         <div>
           <p className={styles.stateDate}>{formatDateLabel(selectedDate)}</p>
-          <h2 className={styles.stateTitle}>{isToday ? 'Oggi' : 'Dettaglio giorno'}</h2>
+          <h2 className={styles.stateTitle}>
+            {isToday ? 'Oggi' : 'Dettaglio giorno'}
+          </h2>
         </div>
         <span className={styles.statusBadge}>{currentDayStatus}</span>
       </div>
@@ -101,7 +103,9 @@ export function DayStateCard({
                     <button
                       type='button'
                       className={styles.linkButton}
-                      onClick={() => startRestTimer(exercise.restPolicySec ?? 90)}
+                      onClick={() =>
+                        startRestTimer(exercise.restPolicySec ?? 90)
+                      }
                     >
                       Recupero {exercise.restPolicySec ?? 90}s
                     </button>
@@ -120,9 +124,14 @@ export function DayStateCard({
                             type='number'
                             value={set.actualKg ?? 0}
                             onChange={(event) =>
-                              updateSessionSet(section.id, exercise.id, set.id, {
-                                actualKg: Number(event.target.value),
-                              })
+                              updateSessionSet(
+                                section.id,
+                                exercise.id,
+                                set.id,
+                                {
+                                  actualKg: Number(event.target.value),
+                                },
+                              )
                             }
                             aria-label='kg'
                           />
@@ -131,9 +140,14 @@ export function DayStateCard({
                             type='number'
                             value={set.actualReps ?? 0}
                             onChange={(event) =>
-                              updateSessionSet(section.id, exercise.id, set.id, {
-                                actualReps: Number(event.target.value),
-                              })
+                              updateSessionSet(
+                                section.id,
+                                exercise.id,
+                                set.id,
+                                {
+                                  actualReps: Number(event.target.value),
+                                },
+                              )
                             }
                             aria-label='reps'
                           />
@@ -142,9 +156,14 @@ export function DayStateCard({
                             type='number'
                             value={set.actualRpe ?? 0}
                             onChange={(event) =>
-                              updateSessionSet(section.id, exercise.id, set.id, {
-                                actualRpe: Number(event.target.value),
-                              })
+                              updateSessionSet(
+                                section.id,
+                                exercise.id,
+                                set.id,
+                                {
+                                  actualRpe: Number(event.target.value),
+                                },
+                              )
                             }
                             aria-label='rpe'
                           />
@@ -231,7 +250,9 @@ export function DayStateCard({
 
       {!selectedSession && selectedTemplate && (
         <div className={styles.infoStack}>
-          <p className={styles.infoLine}>Allenamento pianificato: {selectedTemplate.name}</p>
+          <p className={styles.infoLine}>
+            Allenamento pianificato: {selectedTemplate.name}
+          </p>
           {selectedTemplate.sections.map((section) => (
             <div
               key={section.id}
@@ -249,7 +270,7 @@ export function DayStateCard({
               className={styles.primaryButton}
               onClick={startSession}
             >
-              Inizia workout
+              Inizia allenamento
             </button>
             <button
               type='button'
@@ -265,7 +286,7 @@ export function DayStateCard({
       {!selectedSession && !selectedTemplate && (
         <div className={styles.infoStack}>
           <p className={styles.infoLine}>
-            Nessun workout pianificato. Crea da zero o copia uno esistente.
+            Nessun allenamento pianificato. Crea da zero o copia uno esistente.
           </p>
           <div className={styles.primaryActions}>
             <button
@@ -273,17 +294,19 @@ export function DayStateCard({
               className={styles.primaryButton}
               onClick={() => setMode('create')}
             >
-              Crea workout
+              Crea allenamento
             </button>
             <button
               type='button'
               className={styles.secondaryButton}
               onClick={() => setMode('copy')}
             >
-              Copia workout
+              Copia allenamento
             </button>
           </div>
-          <div className={styles.comingSoon}>Crea con IA · Coming soon (Pro)</div>
+          <div className={styles.comingSoon}>
+            Crea con IA · Prossimamente (Pro)
+          </div>
         </div>
       )}
     </article>

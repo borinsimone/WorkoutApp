@@ -14,9 +14,9 @@ export default function WorkoutPage() {
   return (
     <section
       className={styles.tabPage}
-      aria-label='Workout'
+      aria-label='Allenamenti'
     >
-      <h1 className={styles.tabTitle}>Workout</h1>
+      <h1 className={styles.tabTitle}>Allenamenti</h1>
 
       <WeeklyNavigator {...state} />
       <DayStateCard {...state} />

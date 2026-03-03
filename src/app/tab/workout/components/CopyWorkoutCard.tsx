@@ -23,9 +23,17 @@ export function CopyWorkoutCard({
     return null;
   }
 
+  const sourceTypeLabel: Record<string, string> = {
+    manual: 'Creato da te',
+    copied_session: 'Da sessione passata',
+    copied_template: 'Da template',
+    library: 'Libreria base',
+    ai_generated: 'Generato da IA',
+  };
+
   return (
     <article className={styles.editorCard}>
-      <h3 className={styles.cardTitle}>Copia workout</h3>
+      <h3 className={styles.cardTitle}>Copia allenamento</h3>
 
       <div className={styles.copyBlock}>
         <p className={styles.copyTitle}>Da sessioni passate</p>
@@ -55,7 +63,9 @@ export function CopyWorkoutCard({
             onClick={() => copyFromTemplate(template)}
           >
             <span>{template.name}</span>
-            <span>{template.sourceType}</span>
+            <span>
+              {sourceTypeLabel[template.sourceType] ?? template.sourceType}
+            </span>
           </button>
         ))}
       </div>

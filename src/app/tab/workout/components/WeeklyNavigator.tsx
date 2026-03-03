@@ -4,7 +4,12 @@ import styles from '../styles/page.module.scss';
 
 type WeeklyNavigatorProps = Pick<
   WorkoutState,
-  'store' | 'selectedDate' | 'setSelectedDate' | 'weekDays' | 'moveWeek' | 'weekdayLabels'
+  | 'store'
+  | 'selectedDate'
+  | 'setSelectedDate'
+  | 'weekDays'
+  | 'moveWeek'
+  | 'weekdayLabels'
 >;
 
 export function WeeklyNavigator({
@@ -49,7 +54,9 @@ export function WeeklyNavigator({
         {weekDays.map((day, index) => {
           const dayKey = toDateKey(day);
           const dayPlan = store.dayPlans.find((item) => item.date === dayKey);
-          const daySession = store.sessions.find((item) => item.date === dayKey);
+          const daySession = store.sessions.find(
+            (item) => item.date === dayKey,
+          );
 
           const statusClass =
             daySession?.status === 'completed'

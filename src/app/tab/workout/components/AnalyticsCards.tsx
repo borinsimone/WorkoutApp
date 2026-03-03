@@ -17,7 +17,9 @@ export function AnalyticsCards({
         <h3 className={styles.cardTitle}>Storico recente</h3>
         <div className={styles.copyBlock}>
           {historySessions.length === 0 && (
-            <p className={styles.copyEmpty}>Ancora nessuna sessione completata.</p>
+            <p className={styles.copyEmpty}>
+              Ancora nessuna sessione completata.
+            </p>
           )}
           {historySessions.map((session) => (
             <button
@@ -34,7 +36,7 @@ export function AnalyticsCards({
       </article>
 
       <article className={styles.analyticsCard}>
-        <h3 className={styles.cardTitle}>PR tracking</h3>
+        <h3 className={styles.cardTitle}>Record personali</h3>
         <div className={styles.badgeList}>
           {prRows.length === 0 && (
             <span className={styles.badge}>Nessun PR ancora</span>

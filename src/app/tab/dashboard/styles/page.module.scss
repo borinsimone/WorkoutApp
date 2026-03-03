@@ -12,8 +12,39 @@
   @include tab.tab-subtitle;
 }
 
+.comingSoonCard {
+  margin-top: 22px;
+  border-radius: 16px;
+  border: 1px dashed rgba(137, 160, 176, 0.42);
+  background: rgba(10, 24, 38, 0.5);
+  padding: 14px;
+}
+
+.comingSoonBadge {
+  margin: 0;
+  width: fit-content;
+  border-radius: 999px;
+  background: rgba(88, 217, 165, 0.12);
+  color: rgba(99, 227, 170, 0.92);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 5px 10px;
+}
+
+.comingSoonText {
+  margin: 10px 0 0;
+  color: rgba(201, 212, 219, 0.88);
+  line-height: 1.45;
+}
+
 @media (max-width: 480px) {
   .tabSubtitle {
     @include tab.tab-subtitle-mobile;
+  }
+
+  .comingSoonCard {
+    margin-top: 18px;
+    border-radius: 14px;
+    padding: 12px;
   }
 }
