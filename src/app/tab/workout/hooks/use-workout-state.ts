@@ -80,18 +80,6 @@ export const useWorkoutState = () => {
   const selectedSession =
     store.sessions.find((session) => session.date === selectedDate) ?? null;
 
-  const setTemplateForDay = (dateKey: string, templateId: string) => {
-    setStore((previous) => {
-      const withoutDay = previous.dayPlans.filter(
-        (day) => day.date !== dateKey,
-      );
-      return {
-        ...previous,
-        dayPlans: [...withoutDay, { date: dateKey, templateId }],
-      };
-    });
-  };
-
   const startRestTimer = (seconds: number) => {
     setRestTimerSec(seconds);
     setRestTimerRunning(true);
@@ -558,7 +546,6 @@ export const useWorkoutState = () => {
     startRestTimer,
     toggleRestTimer,
     resetRestTimer,
-    setTemplateForDay,
     assistantVisible,
     setAssistantVisible,
   };

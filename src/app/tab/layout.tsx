@@ -71,8 +71,6 @@ export default function TabLayout({ children }: { children: ReactNode }) {
   return (
     <section className={styles.home}>
       <div className={styles.phoneShell}>
-        <div className={styles.phoneGradient} />
-
         <div className={styles.tabContent}>{children}</div>
 
         <nav

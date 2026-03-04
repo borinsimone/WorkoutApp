@@ -54,10 +54,6 @@
   @include tab.tab-title;
 }
 
-.tabSubtitle {
-  @include tab.tab-subtitle;
-}
-
 .weekCard,
 .stateCard,
 .editorCard,
@@ -664,10 +660,6 @@
 
   .assistantPage {
     padding: 16px 12px 24px;
-  }
-
-  .tabSubtitle {
-    @include tab.tab-subtitle-mobile;
   }
 
   .weekCard,
