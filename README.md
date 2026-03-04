@@ -15,7 +15,7 @@ Apri http://localhost:3000 e prova l'API su http://localhost:3000/api/health.
 
 Il progetto è configurato per deploy automatico con GitHub Actions.
 
-- Workflow: `.github/workflows/deploy-pages.yml`
+- Workflow: `.github/workflows/nextjs.yml`
 - Build output statico: cartella `out/`
 - Deploy automatico a ogni push su `main`
 
