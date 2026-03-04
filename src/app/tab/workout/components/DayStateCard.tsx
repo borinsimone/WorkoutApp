@@ -1,4 +1,5 @@
-import { formatDateLabel, formatTimer } from '../lib/date';
+import { useEffect, useMemo, useState } from 'react';
+import { formatDateLabel, formatDuration, formatStartTime } from '../lib/date';
 import type { WorkoutState } from '../hooks/use-workout-state';
 import styles from '../styles/page.module.scss';
 
@@ -9,19 +10,16 @@ type DayStateCardProps = Pick<
   | 'currentDayStatus'
   | 'selectedSession'
   | 'selectedTemplate'
-  | 'restTimerSec'
-  | 'restTimerRunning'
-  | 'startRestTimer'
-  | 'toggleRestTimer'
-  | 'resetRestTimer'
-  | 'updateSessionSet'
-  | 'toggleSetDone'
-  | 'completeSession'
   | 'saveSessionAsTemplate'
   | 'copyFromSession'
   | 'setMode'
   | 'startSession'
+  | 'deleteCompletedSession'
 >;
+
+type DayStateCardExtraProps = {
+  openAssistant: () => void;
+};
 
 export function DayStateCard({
   selectedDate,
@@ -29,19 +27,43 @@ export function DayStateCard({
   currentDayStatus,
   selectedSession,
   selectedTemplate,
-  restTimerSec,
-  restTimerRunning,
-  startRestTimer,
-  toggleRestTimer,
-  resetRestTimer,
-  updateSessionSet,
-  toggleSetDone,
-  completeSession,
   saveSessionAsTemplate,
   copyFromSession,
   setMode,
   startSession,
-}: DayStateCardProps) {
+  deleteCompletedSession,
+  openAssistant,
+}: DayStateCardProps & DayStateCardExtraProps) {
+  const [nowMs, setNowMs] = useState(() => Date.now());
+
+  useEffect(() => {
+    if (selectedSession?.status !== 'in_progress') {
+      return;
+    }
+
+    const interval = window.setInterval(() => {
+      setNowMs(Date.now());
+    }, 1000);
+
+    return () => window.clearInterval(interval);
+  }, [selectedSession?.status]);
+
+  const inProgressDurationSec = useMemo(() => {
+    if (
+      selectedSession?.status !== 'in_progress' ||
+      !selectedSession.startedAt
+    ) {
+      return 0;
+    }
+
+    const startedAtMs = new Date(selectedSession.startedAt).getTime();
+    if (Number.isNaN(startedAtMs)) {
+      return 0;
+    }
+
+    return Math.max(0, Math.floor((nowMs - startedAtMs) / 1000));
+  }, [selectedSession?.status, selectedSession?.startedAt, nowMs]);
+
   return (
     <article className={styles.stateCard}>
       <div className={styles.stateHeader}>
@@ -53,176 +75,6 @@ export function DayStateCard({
         </div>
         <span className={styles.statusBadge}>{currentDayStatus}</span>
       </div>
-
-      {selectedSession?.status === 'in_progress' && (
-        <>
-          <div className={styles.timerCard}>
-            <p className={styles.timerLabel}>Recupero</p>
-            <p className={styles.timerValue}>{formatTimer(restTimerSec)}</p>
-            <div className={styles.timerActions}>
-              {[60, 90, 120].map((seconds) => (
-                <button
-                  key={seconds}
-                  type='button'
-                  className={styles.pillButton}
-                  onClick={() => startRestTimer(seconds)}
-                >
-                  {seconds}s
-                </button>
-              ))}
-              <button
-                type='button'
-                className={styles.pillButton}
-                onClick={toggleRestTimer}
-              >
-                {restTimerRunning ? 'Pausa' : 'Avvia'}
-              </button>
-              <button
-                type='button'
-                className={styles.pillButton}
-                onClick={resetRestTimer}
-              >
-                Reset
-              </button>
-            </div>
-          </div>
-
-          {selectedSession.sectionsSnapshot.map((section) => (
-            <div
-              key={section.id}
-              className={styles.sectionBlock}
-            >
-              <p className={styles.sectionTitle}>{section.name}</p>
-              {section.exercises.map((exercise) => (
-                <div
-                  key={exercise.id}
-                  className={styles.exerciseCard}
-                >
-                  <div className={styles.exerciseTop}>
-                    <p className={styles.exerciseName}>{exercise.name}</p>
-                    <button
-                      type='button'
-                      className={styles.linkButton}
-                      onClick={() =>
-                        startRestTimer(exercise.restPolicySec ?? 90)
-                      }
-                    >
-                      Recupero {exercise.restPolicySec ?? 90}s
-                    </button>
-                  </div>
-
-                  {exercise.sets.map((set) => (
-                    <div
-                      key={set.id}
-                      className={styles.setRow}
-                    >
-                      <span className={styles.setIndex}>Set {set.order}</span>
-                      {exercise.metricType === 'load_reps' ? (
-                        <>
-                          <input
-                            className={styles.setInput}
-                            type='number'
-                            value={set.actualKg ?? 0}
-                            onChange={(event) =>
-                              updateSessionSet(
-                                section.id,
-                                exercise.id,
-                                set.id,
-                                {
-                                  actualKg: Number(event.target.value),
-                                },
-                              )
-                            }
-                            aria-label='kg'
-                          />
-                          <input
-                            className={styles.setInput}
-                            type='number'
-                            value={set.actualReps ?? 0}
-                            onChange={(event) =>
-                              updateSessionSet(
-                                section.id,
-                                exercise.id,
-                                set.id,
-                                {
-                                  actualReps: Number(event.target.value),
-                                },
-                              )
-                            }
-                            aria-label='reps'
-                          />
-                          <input
-                            className={styles.setInput}
-                            type='number'
-                            value={set.actualRpe ?? 0}
-                            onChange={(event) =>
-                              updateSessionSet(
-                                section.id,
-                                exercise.id,
-                                set.id,
-                                {
-                                  actualRpe: Number(event.target.value),
-                                },
-                              )
-                            }
-                            aria-label='rpe'
-                          />
-                        </>
-                      ) : (
-                        <input
-                          className={styles.setInputWide}
-                          type='number'
-                          value={set.actualDurationSec ?? 0}
-                          onChange={(event) =>
-                            updateSessionSet(section.id, exercise.id, set.id, {
-                              actualDurationSec: Number(event.target.value),
-                            })
-                          }
-                          aria-label='durata secondi'
-                        />
-                      )}
-
-                      <button
-                        type='button'
-                        className={`${styles.doneButton} ${
-                          set.completed ? styles.doneActive : ''
-                        }`}
-                        onClick={() =>
-                          toggleSetDone(
-                            section.id,
-                            exercise.id,
-                            set.id,
-                            !set.completed,
-                          )
-                        }
-                      >
-                        {set.completed ? 'Fatto' : 'Segna'}
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              ))}
-            </div>
-          ))}
-
-          <div className={styles.primaryActions}>
-            <button
-              type='button'
-              className={styles.primaryButton}
-              onClick={completeSession}
-            >
-              Completa allenamento
-            </button>
-            <button
-              type='button'
-              className={styles.secondaryButton}
-              onClick={saveSessionAsTemplate}
-            >
-              Salva come template
-            </button>
-          </div>
-        </>
-      )}
 
       {selectedSession?.status === 'completed' && (
         <div className={styles.infoStack}>
@@ -244,7 +96,43 @@ export function DayStateCard({
             >
               Salva come template
             </button>
+            <button
+              type='button'
+              className={styles.dangerButton}
+              onClick={() => {
+                const shouldDelete = window.confirm(
+                  'Eliminare questo allenamento completato? Questa azione non si può annullare.',
+                );
+
+                if (shouldDelete) {
+                  deleteCompletedSession(selectedSession.id);
+                }
+              }}
+            >
+              Elimina completato
+            </button>
           </div>
+        </div>
+      )}
+
+      {selectedSession?.status === 'in_progress' && (
+        <div className={styles.infoStack}>
+          <p className={styles.infoLine}>
+            Sessione in corso: {selectedSession.nameSnapshot}
+          </p>
+          <p className={styles.infoLine}>
+            Inizio: {formatStartTime(selectedSession.startedAt)}
+          </p>
+          <p className={styles.infoLine}>
+            Durata: {formatDuration(inProgressDurationSec)}
+          </p>
+          <button
+            type='button'
+            className={styles.primaryButton}
+            onClick={openAssistant}
+          >
+            Apri assistant
+          </button>
         </div>
       )}
 

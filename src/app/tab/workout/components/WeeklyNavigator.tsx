@@ -27,8 +27,10 @@ export function WeeklyNavigator({
           type='button'
           className={styles.weekSwitch}
           onClick={() => moveWeek(-7)}
+          aria-label='Settimana precedente'
+          title='Settimana precedente'
         >
-          ← Settimana prec.
+          ‹
         </button>
         <p className={styles.weekRangeLabel}>
           {weekDays[0].toLocaleDateString('it-IT', {
@@ -45,8 +47,10 @@ export function WeeklyNavigator({
           type='button'
           className={styles.weekSwitch}
           onClick={() => moveWeek(7)}
+          aria-label='Settimana successiva'
+          title='Settimana successiva'
         >
-          Settimana succ. →
+          ›
         </button>
       </div>
 

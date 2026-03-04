@@ -76,7 +76,7 @@ export default function TabLayout({ children }: { children: ReactNode }) {
         <div className={styles.tabContent}>{children}</div>
 
         <nav
-          className={styles.bottomNav}
+          className={`${styles.bottomNav} workout-bottom-nav`}
           aria-label='Navigazione principale'
           style={{ '--active-index': activeIndex } as CSSProperties}
         >

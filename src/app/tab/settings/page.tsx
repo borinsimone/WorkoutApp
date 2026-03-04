@@ -65,7 +65,7 @@ export default function SettingsPage() {
               </span>
             </span>
             <span className={`${styles.settingsPill} ${styles.isMuted}`}>
-              Disattive
+              Disattivati
             </span>
           </div>
         </article>

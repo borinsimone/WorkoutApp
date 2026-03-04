@@ -32,3 +32,18 @@ body {
   justify-content: center;
   align-items: flex-start;
 }
+
+body.workout-modal-open {
+  overflow: hidden;
+}
+
+body.workout-assistant-open {
+  overflow: hidden;
+}
+
+body.workout-modal-open .workout-bottom-nav,
+body.workout-assistant-open .workout-bottom-nav {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(20px);
+}

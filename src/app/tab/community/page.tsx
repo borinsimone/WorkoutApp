@@ -8,13 +8,13 @@ export default function CommunityPage() {
     >
       <h1 className={styles.tabTitle}>Comunità</h1>
       <p className={styles.tabSubtitle}>
-        Feed, gruppi e attività della tua community.
+        Feed, gruppi e attività della comunità.
       </p>
 
       <article className={styles.comingSoonCard}>
         <p className={styles.comingSoonBadge}>Prossimamente</p>
         <p className={styles.comingSoonText}>
-          Qui arriveranno feed condiviso, gruppi tematici, sfide tra utenti e
+          Qui troverai feed condiviso, gruppi tematici, sfide tra utenti e
           commenti sugli allenamenti.
         </p>
       </article>

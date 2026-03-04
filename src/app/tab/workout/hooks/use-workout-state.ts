@@ -36,6 +36,7 @@ export const useWorkoutState = () => {
 
   const [restTimerSec, setRestTimerSec] = useState(0);
   const [restTimerRunning, setRestTimerRunning] = useState(false);
+  const [assistantVisible, setAssistantVisible] = useState(false);
 
   useEffect(() => {
     if (typeof window === 'undefined') {
@@ -272,6 +273,7 @@ export const useWorkoutState = () => {
         session,
       ],
     }));
+    setAssistantVisible(true);
   };
 
   const updateSessionSet = (
@@ -336,6 +338,19 @@ export const useWorkoutState = () => {
       return;
     }
 
+    const completedAt = new Date().toISOString();
+    const startedTimestamp = selectedSession.startedAt
+      ? new Date(selectedSession.startedAt).getTime()
+      : null;
+    const completedTimestamp = new Date(completedAt).getTime();
+    const durationSec =
+      startedTimestamp && !Number.isNaN(startedTimestamp)
+        ? Math.max(
+            0,
+            Math.floor((completedTimestamp - startedTimestamp) / 1000),
+          )
+        : 0;
+
     setStore((previous) => ({
       ...previous,
       sessions: previous.sessions.map((session) =>
@@ -343,12 +358,50 @@ export const useWorkoutState = () => {
           ? {
               ...session,
               status: 'completed',
-              completedAt: new Date().toISOString(),
+              completedAt,
+              durationSec,
             }
           : session,
       ),
     }));
+    setAssistantVisible(false);
   };
+
+  const deleteCompletedSession = (sessionId: string) => {
+    setStore((previous) => ({
+      ...previous,
+      sessions: previous.sessions.filter(
+        (session) =>
+          !(session.id === sessionId && session.status === 'completed'),
+      ),
+    }));
+  };
+
+  const restoreDeletedSession = (sessionToRestore: WorkoutSession) => {
+    setStore((previous) => {
+      const alreadyExists = previous.sessions.some(
+        (session) => session.id === sessionToRestore.id,
+      );
+
+      if (alreadyExists) {
+        return previous;
+      }
+
+      return {
+        ...previous,
+        sessions: [...previous.sessions, sessionToRestore],
+      };
+    });
+  };
+
+  useEffect(() => {
+    if (selectedSession?.status === 'in_progress') {
+      setAssistantVisible(true);
+      return;
+    }
+
+    setAssistantVisible(false);
+  }, [selectedSession?.id, selectedSession?.status]);
 
   const saveSessionAsTemplate = () => {
     if (!selectedSession) {
@@ -497,6 +550,8 @@ export const useWorkoutState = () => {
     updateSessionSet,
     toggleSetDone,
     completeSession,
+    deleteCompletedSession,
+    restoreDeletedSession,
     saveSessionAsTemplate,
     restTimerSec,
     restTimerRunning,
@@ -504,6 +559,8 @@ export const useWorkoutState = () => {
     toggleRestTimer,
     resetRestTimer,
     setTemplateForDay,
+    assistantVisible,
+    setAssistantVisible,
   };
 };
 

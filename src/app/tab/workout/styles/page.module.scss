@@ -6,6 +6,50 @@
   gap: 14px;
 }
 
+.assistantPage {
+  position: fixed;
+  inset: 0;
+  z-index: 110;
+  overflow-y: auto;
+  padding: 20px 16px 28px;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--mint) 20%, #0a1721) 0%,
+    var(--bg) 44%,
+    color-mix(in srgb, var(--nav-bg) 58%, #111922) 100%
+  );
+}
+
+.assistantInner {
+  width: min(100%, 430px);
+  margin: 0 auto;
+  display: grid;
+  gap: 14px;
+}
+
+.assistantHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.assistantTopBar {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.assistantCloseButton {
+  border: none;
+  border-radius: 999px;
+  padding: 8px 12px;
+  background: rgba(66, 87, 103, 0.55);
+  color: rgba(202, 214, 221, 0.96);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
 .tabTitle {
   @include tab.tab-title;
 }
@@ -22,6 +66,33 @@
   border: 1px solid rgba(110, 210, 174, 0.16);
   background: rgba(14, 54, 76, 0.54);
   padding: 14px;
+}
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(2, 9, 17, 0.58);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.modalSheet {
+  width: min(100%, 560px);
+  max-height: min(86dvh, 760px);
+  overflow: auto;
+  border-radius: 22px;
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
 }
 
 .weekTopBar {
@@ -153,6 +224,64 @@
   flex-wrap: wrap;
 }
 
+.customTimerRow {
+  margin-top: 12px;
+  display: grid;
+  gap: 8px;
+}
+
+.iosPicker {
+  display: flex;
+  align-items: end;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 10px;
+  border-radius: 14px;
+  border: 1px solid rgba(110, 210, 174, 0.14);
+  background: rgba(9, 24, 37, 0.56);
+}
+
+.pickerColumn {
+  display: grid;
+  gap: 5px;
+  min-width: 76px;
+}
+
+.pickerLabel {
+  font-size: 11px;
+  color: rgba(171, 196, 209, 0.72);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.pickerSelect {
+  border: 1px solid rgba(168, 199, 214, 0.22);
+  border-radius: 10px;
+  background: rgba(10, 24, 38, 0.72);
+  color: #c9d4db;
+  padding: 8px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.pickerDivider {
+  align-self: center;
+  padding: 0 2px 6px;
+  color: rgba(171, 196, 209, 0.86);
+  font-weight: 700;
+}
+
+.pickerApplyButton {
+  border: none;
+  border-radius: 10px;
+  padding: 9px 12px;
+  background: rgba(88, 217, 165, 0.2);
+  color: rgba(99, 227, 170, 0.98);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
 .pillButton {
   border: none;
   border-radius: 999px;
@@ -223,6 +352,40 @@
   color: rgba(171, 196, 209, 0.82);
 }
 
+.setHeadRow,
+.setHeadRowTime {
+  margin-top: 8px;
+  display: grid;
+  align-items: center;
+  gap: 6px;
+}
+
+.setHeadRow {
+  grid-template-columns: 54px repeat(3, minmax(0, 1fr)) 66px;
+}
+
+.setHeadRowTime {
+  grid-template-columns: 54px repeat(3, minmax(0, 1fr)) 66px;
+}
+
+.setHeadSpacer {
+  display: block;
+}
+
+.setHeadCell,
+.setHeadCellWide {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: rgba(171, 196, 209, 0.72);
+  text-align: center;
+}
+
+.setHeadCellWide {
+  grid-column: span 3;
+}
+
 .setInput,
 .setInputWide,
 .textInput,
@@ -283,6 +446,24 @@
 .secondaryButton {
   background: rgba(66, 87, 103, 0.5);
   color: rgba(202, 214, 221, 0.96);
+}
+
+.dangerButton,
+.dangerButtonCompact {
+  border: none;
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  background: rgba(255, 117, 117, 0.16);
+  color: rgba(255, 171, 171, 0.98);
+}
+
+.dangerButtonCompact {
+  border-radius: 10px;
+  padding: 8px 10px;
+  font-size: 12px;
 }
 
 .infoStack {
@@ -398,9 +579,55 @@
   cursor: pointer;
 }
 
+.historyRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.undoToast {
+  position: fixed;
+  left: 50%;
+  bottom: 88px;
+  transform: translateX(-50%);
+  z-index: 130;
+  width: min(calc(100% - 24px), 420px);
+  border-radius: 14px;
+  border: 1px solid rgba(146, 182, 201, 0.24);
+  background: rgba(9, 24, 37, 0.92);
+  padding: 10px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.undoToastText {
+  color: rgba(201, 212, 219, 0.96);
+  font-size: 13px;
+}
+
+.undoToastButton {
+  border: none;
+  border-radius: 10px;
+  padding: 7px 10px;
+  background: rgba(88, 217, 165, 0.2);
+  color: rgba(99, 227, 170, 0.98);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
 @media (max-width: 480px) {
   .tabPage {
     gap: 12px;
+  }
+
+  .assistantPage {
+    padding: 16px 12px 24px;
   }
 
   .tabSubtitle {
@@ -413,6 +640,17 @@
   .analyticsCard {
     border-radius: 18px;
     padding: 12px;
+  }
+
+  .modalOverlay {
+    padding: 10px;
+    align-items: center;
+  }
+
+  .modalSheet {
+    width: 100%;
+    max-height: 88dvh;
+    border-radius: 18px;
   }
 
   .weekTopBar {
@@ -440,7 +678,16 @@
     grid-template-columns: 46px repeat(3, minmax(0, 1fr)) 62px;
   }
 
+  .setHeadRow,
+  .setHeadRowTime {
+    grid-template-columns: 46px repeat(3, minmax(0, 1fr)) 62px;
+  }
+
   .inlineEditor {
     grid-template-columns: 1fr;
+  }
+
+  .undoToast {
+    bottom: 78px;
   }
 }

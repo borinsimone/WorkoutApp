@@ -3,13 +3,14 @@ import styles from '../styles/page.module.scss';
 
 type AnalyticsCardsProps = Pick<
   WorkoutState,
-  'historySessions' | 'setSelectedDate' | 'prRows'
+  'historySessions' | 'setSelectedDate' | 'prRows' | 'deleteCompletedSession'
 >;
 
 export function AnalyticsCards({
   historySessions,
   setSelectedDate,
   prRows,
+  deleteCompletedSession,
 }: AnalyticsCardsProps) {
   return (
     <>
@@ -22,15 +23,34 @@ export function AnalyticsCards({
             </p>
           )}
           {historySessions.map((session) => (
-            <button
+            <div
               key={session.id}
-              type='button'
-              className={styles.copyRow}
-              onClick={() => setSelectedDate(session.date)}
+              className={styles.historyRow}
             >
-              <span>{session.nameSnapshot}</span>
-              <span>{session.date}</span>
-            </button>
+              <button
+                type='button'
+                className={styles.copyRow}
+                onClick={() => setSelectedDate(session.date)}
+              >
+                <span>{session.nameSnapshot}</span>
+                <span>{session.date}</span>
+              </button>
+              <button
+                type='button'
+                className={styles.dangerButtonCompact}
+                onClick={() => {
+                  const shouldDelete = window.confirm(
+                    'Eliminare questo allenamento completato dallo storico?',
+                  );
+
+                  if (shouldDelete) {
+                    deleteCompletedSession(session.id);
+                  }
+                }}
+              >
+                Elimina
+              </button>
+            </div>
           ))}
         </div>
       </article>

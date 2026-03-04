@@ -89,6 +89,7 @@ export type WorkoutSession = {
   sectionsSnapshot: SessionSection[];
   startedAt?: string;
   completedAt?: string;
+  durationSec?: number;
 };
 
 export type DayWorkoutPlan = {
