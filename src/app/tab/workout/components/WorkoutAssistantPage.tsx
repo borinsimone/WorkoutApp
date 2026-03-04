@@ -459,8 +459,7 @@ export function WorkoutAssistantPage({
                             )
                           }
                           disabled={
-                            !!activeTimedSet &&
-                            activeTimedSet.setId !== set.id
+                            !!activeTimedSet && activeTimedSet.setId !== set.id
                           }
                         >
                           Inizia
