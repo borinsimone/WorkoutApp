@@ -1,5 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
+  DEFAULT_WORKOUT_PREP_SECONDS,
+  getWorkoutPrepSeconds,
+} from '../../../lib/preferences';
+import {
   formatDateLabel,
   formatDuration,
   formatStartTime,
@@ -27,6 +31,15 @@ type WorkoutAssistantExtraProps = {
   closeAssistant: () => void;
 };
 
+type ActiveTimedSet = {
+  sectionId: string;
+  exerciseId: string;
+  setId: string;
+  phase: 'prep' | 'work';
+  remainingSec: number;
+  targetDurationSec: number;
+};
+
 export function WorkoutAssistantPage({
   selectedDate,
   selectedSession,
@@ -44,18 +57,114 @@ export function WorkoutAssistantPage({
   const [nowMs, setNowMs] = useState(() => Date.now());
   const [customMinutes, setCustomMinutes] = useState(1);
   const [customSeconds, setCustomSeconds] = useState(30);
+  const [prepSeconds, setPrepSeconds] = useState(DEFAULT_WORKOUT_PREP_SECONDS);
+  const [activeTimedSet, setActiveTimedSet] = useState<ActiveTimedSet | null>(
+    null,
+  );
 
   useEffect(() => {
     if (selectedSession?.status !== 'in_progress') {
       return;
     }
 
+    setPrepSeconds(getWorkoutPrepSeconds());
+
+    const onStorage = (event: StorageEvent) => {
+      if (!event.key || event.key.includes('workout-prep-seconds')) {
+        setPrepSeconds(getWorkoutPrepSeconds());
+      }
+    };
+
+    window.addEventListener('storage', onStorage);
+
     const interval = window.setInterval(() => {
       setNowMs(Date.now());
     }, 1000);
 
-    return () => window.clearInterval(interval);
+    return () => {
+      window.clearInterval(interval);
+      window.removeEventListener('storage', onStorage);
+    };
   }, [selectedSession?.status]);
+
+  const playTone = (frequency: number, durationMs: number, volume = 0.1) => {
+    try {
+      const audioContext = new window.AudioContext();
+      const oscillator = audioContext.createOscillator();
+      const gain = audioContext.createGain();
+
+      oscillator.type = 'sine';
+      oscillator.frequency.value = frequency;
+      gain.gain.value = volume;
+
+      oscillator.connect(gain);
+      gain.connect(audioContext.destination);
+
+      oscillator.start();
+      oscillator.stop(audioContext.currentTime + durationMs / 1000);
+      window.setTimeout(() => {
+        void audioContext.close();
+      }, durationMs + 80);
+    } catch {
+      // Audio opzionale: ignora errori (browser policy/device).
+    }
+  };
+
+  useEffect(() => {
+    if (!activeTimedSet) {
+      return;
+    }
+
+    if (activeTimedSet.remainingSec <= 0) {
+      if (activeTimedSet.phase === 'prep') {
+        playTone(920, 240, 0.12);
+        setActiveTimedSet((previous) =>
+          previous
+            ? {
+                ...previous,
+                phase: 'work',
+                remainingSec: previous.targetDurationSec,
+              }
+            : null,
+        );
+      } else {
+        playTone(1020, 320, 0.14);
+        updateSessionSet(
+          activeTimedSet.sectionId,
+          activeTimedSet.exerciseId,
+          activeTimedSet.setId,
+          {
+            actualDurationSec: activeTimedSet.targetDurationSec,
+            completed: true,
+            completedAt: new Date().toISOString(),
+          },
+        );
+        setActiveTimedSet(null);
+      }
+
+      return;
+    }
+
+    const isLastThreeSec = activeTimedSet.remainingSec <= 3;
+    if (isLastThreeSec) {
+      playTone(activeTimedSet.phase === 'prep' ? 760 : 620, 120, 0.08);
+    }
+
+    const interval = window.setInterval(() => {
+      setActiveTimedSet((previous) => {
+        if (!previous) {
+          return null;
+        }
+
+        return {
+          ...previous,
+          remainingSec: Math.max(0, previous.remainingSec - 1),
+        };
+      });
+    }, 1000);
+
+    return () => window.clearInterval(interval);
+  }, [activeTimedSet, updateSessionSet]);
 
   const workoutDurationSec = useMemo(() => {
     if (
@@ -80,6 +189,33 @@ export function WorkoutAssistantPage({
     }
 
     startRestTimer(totalSeconds);
+  };
+
+  const startTimedSet = (
+    sectionId: string,
+    exerciseId: string,
+    setId: string,
+    targetDurationSec: number,
+  ) => {
+    const normalizedTarget = Math.max(1, Math.floor(targetDurationSec));
+    const normalizedPrep = Math.max(0, Math.floor(prepSeconds));
+
+    if (normalizedPrep > 0) {
+      playTone(540, 150, 0.1);
+    }
+
+    setActiveTimedSet({
+      sectionId,
+      exerciseId,
+      setId,
+      phase: normalizedPrep > 0 ? 'prep' : 'work',
+      remainingSec: normalizedPrep > 0 ? normalizedPrep : normalizedTarget,
+      targetDurationSec: normalizedTarget,
+    });
+  };
+
+  const stopTimedSet = () => {
+    setActiveTimedSet(null);
   };
 
   if (!selectedSession || selectedSession.status !== 'in_progress') {
@@ -299,17 +435,37 @@ export function WorkoutAssistantPage({
                         />
                       </>
                     ) : (
-                      <input
-                        className={styles.setInputWide}
-                        type='number'
-                        value={set.actualDurationSec ?? 0}
-                        onChange={(event) =>
-                          updateSessionSet(section.id, exercise.id, set.id, {
-                            actualDurationSec: Number(event.target.value),
-                          })
-                        }
-                        aria-label='durata secondi'
-                      />
+                      <div className={styles.timeSetBlock}>
+                        <input
+                          className={styles.setInputWide}
+                          type='number'
+                          value={set.actualDurationSec ?? 0}
+                          onChange={(event) =>
+                            updateSessionSet(section.id, exercise.id, set.id, {
+                              actualDurationSec: Number(event.target.value),
+                            })
+                          }
+                          aria-label='durata secondi'
+                        />
+                        <button
+                          type='button'
+                          className={styles.inlineStartButton}
+                          onClick={() =>
+                            startTimedSet(
+                              section.id,
+                              exercise.id,
+                              set.id,
+                              set.actualDurationSec ?? 30,
+                            )
+                          }
+                          disabled={
+                            !!activeTimedSet &&
+                            activeTimedSet.setId !== set.id
+                          }
+                        >
+                          Inizia
+                        </button>
+                      </div>
                     )}
 
                     <button
@@ -330,6 +486,25 @@ export function WorkoutAssistantPage({
                     </button>
                   </div>
                 ))}
+
+                {activeTimedSet &&
+                  activeTimedSet.sectionId === section.id &&
+                  activeTimedSet.exerciseId === exercise.id && (
+                    <div className={styles.timedSetStatus}>
+                      <p className={styles.previewValue}>
+                        {activeTimedSet.phase === 'prep'
+                          ? `Preparazione: ${activeTimedSet.remainingSec}s`
+                          : `Timer esercizio: ${activeTimedSet.remainingSec}s`}
+                      </p>
+                      <button
+                        type='button'
+                        className={styles.secondaryButton}
+                        onClick={stopTimedSet}
+                      >
+                        Interrompi
+                      </button>
+                    </div>
+                  )}
               </div>
             ))}
           </div>

@@ -1,6 +1,25 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import {
+  DEFAULT_WORKOUT_PREP_SECONDS,
+  getWorkoutPrepSeconds,
+  setWorkoutPrepSeconds,
+} from '../../lib/preferences';
 import styles from './styles/page.module.scss';
 
 export default function SettingsPage() {
+  const [prepSeconds, setPrepSeconds] = useState(DEFAULT_WORKOUT_PREP_SECONDS);
+
+  useEffect(() => {
+    setPrepSeconds(getWorkoutPrepSeconds());
+  }, []);
+
+  const handlePrepSecondsChange = (value: number) => {
+    setPrepSeconds(value);
+    setWorkoutPrepSeconds(value);
+  };
+
   return (
     <section
       className={styles.tabPage}
@@ -38,6 +57,43 @@ export default function SettingsPage() {
             </span>
             <span className={styles.settingsRowAction}>Apri</span>
           </button>
+        </article>
+
+        <article className={styles.settingsCard}>
+          <p className={styles.settingsSectionTitle}>Allenamento</p>
+
+          <div className={styles.settingsRow}>
+            <span className={styles.settingsRowLeft}>
+              <span className={styles.settingsRowLabel}>
+                Countdown preparazione
+              </span>
+              <span className={styles.settingsRowValue}>
+                Prima dei set a tempo (0-30 secondi)
+              </span>
+            </span>
+
+            <label
+              className={styles.settingsInputWrap}
+              aria-label='Secondi preparazione'
+            >
+              <select
+                className={styles.settingsInput}
+                value={prepSeconds}
+                onChange={(event) =>
+                  handlePrepSecondsChange(Number(event.target.value))
+                }
+              >
+                {Array.from({ length: 31 }, (_, index) => (
+                  <option
+                    key={`prep-${index}`}
+                    value={index}
+                  >
+                    {index}s
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
         </article>
 
         <article className={styles.settingsCard}>

@@ -86,6 +86,20 @@ button.settingsRow {
   background: rgba(88, 217, 165, 0.12);
 }
 
+.settingsInputWrap {
+  flex-shrink: 0;
+}
+
+.settingsInput {
+  border: 1px solid rgba(168, 199, 214, 0.22);
+  border-radius: 10px;
+  background: rgba(10, 24, 38, 0.65);
+  color: #c9d4db;
+  padding: 7px 10px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
 .isMuted {
   color: rgba(169, 186, 197, 0.82);
   background: rgba(158, 176, 188, 0.16);
