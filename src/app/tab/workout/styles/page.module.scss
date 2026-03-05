@@ -77,8 +77,6 @@
   border-radius: 0;
   border: none;
   background: transparent;
-  padding: calc(env(safe-area-inset-top) + 16px) 16px
-    calc(env(safe-area-inset-bottom) + 28px);
 }
 
 .editorCard {
@@ -92,6 +90,7 @@
   border: 1px solid rgba(110, 210, 174, 0.16);
   background: rgba(14, 54, 76, 0.54);
   padding: 14px;
+  // padding-top: calc(30px + env(safe-area-inset-top));
 }
 
 .modalOverlay {
@@ -714,13 +713,7 @@
     padding: calc(env(safe-area-inset-top) + 14px) 12px 24px;
   }
 
-  .formFullScreen {
-    padding: 0;
-  }
-
   .formFullScreenCard {
-    padding: calc(env(safe-area-inset-top) + 14px) 12px
-      calc(env(safe-area-inset-bottom) + 24px);
   }
 
   .weekCard,
