@@ -104,16 +104,34 @@ export default function WorkoutPage() {
         deleteCompletedSession={handleDeleteCompletedSession}
       />
 
-      {lastDeletedSession && (
-        <div className={styles.undoToast}>
-          <span className={styles.undoToastText}>Allenamento eliminato</span>
-          <button
-            type='button'
-            className={styles.undoToastButton}
-            onClick={handleUndoDelete}
-          >
-            Annulla
-          </button>
+      {(state.feedbackToast || lastDeletedSession) && (
+        <div
+          className={styles.toastStack}
+          role='status'
+          aria-live='polite'
+        >
+          {state.feedbackToast && (
+            <div className={styles.infoToast}>
+              <span className={styles.infoToastText}>
+                {state.feedbackToast}
+              </span>
+            </div>
+          )}
+
+          {lastDeletedSession && (
+            <div className={styles.undoToast}>
+              <span className={styles.undoToastText}>
+                Allenamento eliminato
+              </span>
+              <button
+                type='button'
+                className={styles.undoToastButton}
+                onClick={handleUndoDelete}
+              >
+                Annulla
+              </button>
+            </div>
+          )}
         </div>
       )}
     </section>

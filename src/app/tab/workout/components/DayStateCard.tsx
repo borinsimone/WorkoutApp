@@ -14,6 +14,8 @@ type DayStateCardProps = Pick<
   | 'copyFromSession'
   | 'setMode'
   | 'startSession'
+  | 'editPlannedWorkout'
+  | 'deletePlannedWorkout'
   | 'deleteCompletedSession'
 >;
 
@@ -31,6 +33,8 @@ export function DayStateCard({
   copyFromSession,
   setMode,
   startSession,
+  editPlannedWorkout,
+  deletePlannedWorkout,
   deleteCompletedSession,
   openAssistant,
 }: DayStateCardProps & DayStateCardExtraProps) {
@@ -166,6 +170,29 @@ export function DayStateCard({
               onClick={() => setMode('copy')}
             >
               Sostituisci con copia
+            </button>
+            <button
+              type='button'
+              className={styles.secondaryButton}
+              onClick={editPlannedWorkout}
+            >
+              Modifica programmato
+            </button>
+
+            <button
+              type='button'
+              className={styles.dangerButton}
+              onClick={() => {
+                const shouldDelete = window.confirm(
+                  'Eliminare questo allenamento programmato?',
+                );
+
+                if (shouldDelete) {
+                  deletePlannedWorkout();
+                }
+              }}
+            >
+              Elimina programmato
             </button>
           </div>
         </div>

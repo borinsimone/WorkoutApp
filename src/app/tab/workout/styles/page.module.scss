@@ -11,7 +11,7 @@
   inset: 0;
   z-index: 110;
   overflow-y: auto;
-  padding: 20px 16px 28px;
+  padding: calc(env(safe-area-inset-top) + 20px) 16px 28px;
   background: linear-gradient(
     180deg,
     color-mix(in srgb, var(--mint) 20%, #0a1721) 0%,
@@ -54,6 +54,36 @@
   @include tab.tab-title;
 }
 
+.formFullScreen {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  overflow-y: auto;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--mint) 20%, #0a1721) 0%,
+    var(--bg) 44%,
+    color-mix(in srgb, var(--nav-bg) 58%, #111922) 100%
+  );
+}
+
+.formFullScreenInner {
+  width: 100%;
+  min-height: 100dvh;
+}
+
+.formFullScreenCard {
+  min-height: 100dvh;
+  border-radius: 0;
+  border: none;
+  background: transparent;
+  padding: calc(env(safe-area-inset-top) + 16px) 16px
+    calc(env(safe-area-inset-bottom) + 28px);
+}
+
+.editorCard {
+  overflow: visible;
+}
 .weekCard,
 .stateCard,
 .editorCard,
@@ -89,6 +119,7 @@
   justify-content: space-between;
   align-items: center;
   gap: 10px;
+  margin-bottom: 10px;
 }
 
 .weekTopBar {
@@ -557,10 +588,14 @@
   margin-top: 8px;
 }
 
+.textArea + .textInput {
+  margin-top: 8px;
+}
+
 .inlineEditor {
   margin-top: 10px;
   display: grid;
-  grid-template-columns: 1fr 140px auto;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
 }
 
@@ -618,31 +653,45 @@
   align-items: center;
 }
 
-.undoToast {
+.toastStack {
   position: fixed;
+  top: calc(env(safe-area-inset-top) + 18px);
   left: 50%;
-
-  bottom: 20vh;
-  bottom: 20dvh;
-
   transform: translateX(-50%);
   z-index: 130;
   width: min(calc(100% - 24px), 420px);
+  display: grid;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.infoToast,
+.undoToast {
   border-radius: 14px;
   border: 1px solid rgba(146, 182, 201, 0.24);
   background: rgba(9, 24, 37, 0.92);
   padding: 10px 12px;
+  pointer-events: auto;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.infoToast {
+  display: block;
+}
+
+.undoToast {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 10px;
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
 }
 
+.infoToastText,
 .undoToastText {
   color: rgba(201, 212, 219, 0.96);
   font-size: 13px;
+  line-height: 1.25;
 }
 
 .undoToastButton {
@@ -662,7 +711,16 @@
   }
 
   .assistantPage {
-    padding: 16px 12px 24px;
+    padding: calc(env(safe-area-inset-top) + 14px) 12px 24px;
+  }
+
+  .formFullScreen {
+    padding: 0;
+  }
+
+  .formFullScreenCard {
+    padding: calc(env(safe-area-inset-top) + 14px) 12px
+      calc(env(safe-area-inset-bottom) + 24px);
   }
 
   .weekCard,
@@ -718,7 +776,8 @@
     grid-template-columns: 1fr;
   }
 
-  .undoToast {
-    bottom: 78px;
+  .toastStack {
+    top: calc(env(safe-area-inset-top) + 14px);
+    width: min(calc(100% - 16px), 420px);
   }
 }

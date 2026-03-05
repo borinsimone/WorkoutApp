@@ -103,10 +103,25 @@ export type WorkoutStore = {
   dayPlans: DayWorkoutPlan[];
 };
 
+export type DraftExerciseSet = {
+  id: string;
+  targetReps?: number;
+  loadKg?: number;
+  rpe?: number;
+  targetSec?: number;
+};
+
 export type DraftExercise = {
   id: string;
   name: string;
-  metricType: ExerciseMetricType;
+  kind: ExerciseMetricType;
+  sets: DraftExerciseSet[];
 };
 
-export type WorkoutEditorMode = 'none' | 'create' | 'copy';
+export type DraftSection = {
+  id: string;
+  name: string;
+  exercises: DraftExercise[];
+};
+
+export type WorkoutEditorMode = 'none' | 'create' | 'copy' | 'edit';

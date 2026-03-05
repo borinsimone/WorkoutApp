@@ -2,14 +2,18 @@ import { useEffect, useMemo, useState } from 'react';
 import { addDays, startOfWeek, toDateKey, weekdayLabels } from '../lib/date';
 import {
   cloneTemplateToSessionSections,
-  createDefaultSetPlans,
   createId,
   loadStore,
   STORAGE_KEY,
 } from '../lib/store';
 import type {
+  ExerciseKind,
+  WorkoutTemplate as WorkoutModelTemplate,
+} from '../workout-model.types';
+import type {
   DraftExercise,
-  ExerciseMetricType,
+  DraftExerciseSet,
+  DraftSection,
   SessionSet,
   WorkoutEditorMode,
   WorkoutSession,
@@ -29,14 +33,50 @@ export const useWorkoutState = () => {
 
   const [draftName, setDraftName] = useState('');
   const [draftNotes, setDraftNotes] = useState('');
+  const [draftSectionName, setDraftSectionName] = useState('Main');
+  const [draftTargetSectionId, setDraftTargetSectionId] = useState('');
   const [draftExerciseName, setDraftExerciseName] = useState('');
-  const [draftMetricType, setDraftMetricType] =
-    useState<ExerciseMetricType>('load_reps');
-  const [draftExercises, setDraftExercises] = useState<DraftExercise[]>([]);
+  const [draftExerciseKind, setDraftExerciseKind] =
+    useState<ExerciseKind>('load_reps');
+  const createDraftSetRow = (
+    kind: ExerciseKind,
+    seed?: DraftExerciseSet,
+  ): DraftExerciseSet => {
+    if (kind === 'time') {
+      return {
+        id: createId(),
+        targetSec: Math.max(1, seed?.targetSec ?? 30),
+      };
+    }
+
+    return {
+      id: createId(),
+      loadKg: Math.max(0, seed?.loadKg ?? 0),
+      targetReps: Math.max(1, seed?.targetReps ?? 10),
+      rpe: Math.max(1, Math.min(10, seed?.rpe ?? 7)),
+    };
+  };
+  const [draftSetRows, setDraftSetRows] = useState<DraftExerciseSet[]>([
+    createDraftSetRow('load_reps'),
+  ]);
+  const [draftSections, setDraftSections] = useState<DraftSection[]>([]);
 
   const [restTimerSec, setRestTimerSec] = useState(0);
   const [restTimerRunning, setRestTimerRunning] = useState(false);
   const [assistantVisible, setAssistantVisible] = useState(false);
+  const [feedbackToast, setFeedbackToast] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!feedbackToast) {
+      return;
+    }
+
+    const timeout = window.setTimeout(() => {
+      setFeedbackToast(null);
+    }, 2400);
+
+    return () => window.clearTimeout(timeout);
+  }, [feedbackToast]);
 
   useEffect(() => {
     if (typeof window === 'undefined') {
@@ -94,53 +134,565 @@ export const useWorkoutState = () => {
     setRestTimerSec(0);
   };
 
-  const addDraftExercise = () => {
-    if (!draftExerciseName.trim()) {
+  useEffect(() => {
+    setDraftSetRows((previous) => {
+      if (previous.length === 0) {
+        return [createDraftSetRow(draftExerciseKind)];
+      }
+
+      return previous.map((row) => createDraftSetRow(draftExerciseKind, row));
+    });
+  }, [draftExerciseKind]);
+
+  useEffect(() => {
+    setDraftTargetSectionId((current) => {
+      if (draftSections.length === 0) {
+        return '';
+      }
+
+      const hasCurrentSection = draftSections.some(
+        (section) => section.id === current,
+      );
+
+      if (hasCurrentSection) {
+        return current;
+      }
+
+      return draftSections[0].id;
+    });
+  }, [draftSections]);
+
+  const addDraftSection = () => {
+    const sectionName = draftSectionName.trim();
+
+    if (!sectionName) {
       return;
     }
 
-    setDraftExercises((previous) => [
+    const sectionId = createId();
+
+    setDraftSections((previous) => [
       ...previous,
       {
-        id: createId(),
-        name: draftExerciseName.trim(),
-        metricType: draftMetricType,
+        id: sectionId,
+        name: sectionName,
+        exercises: [],
       },
     ]);
+
+    setDraftSectionName('');
+    setDraftTargetSectionId(sectionId);
+  };
+
+  const removeDraftSection = (sectionId: string) => {
+    setDraftSections((previous) =>
+      previous.filter((section) => section.id !== sectionId),
+    );
+  };
+
+  const updateDraftSection = (sectionId: string, name: string) => {
+    setDraftSections((previous) =>
+      previous.map((section) =>
+        section.id === sectionId ? { ...section, name } : section,
+      ),
+    );
+  };
+
+  const moveDraftSection = (
+    sourceSectionId: string,
+    targetSectionId: string,
+  ) => {
+    if (sourceSectionId === targetSectionId) {
+      return;
+    }
+
+    setDraftSections((previous) => {
+      const sourceIndex = previous.findIndex(
+        (section) => section.id === sourceSectionId,
+      );
+      const targetIndex = previous.findIndex(
+        (section) => section.id === targetSectionId,
+      );
+
+      if (sourceIndex < 0 || targetIndex < 0) {
+        return previous;
+      }
+
+      const next = [...previous];
+      const [movingSection] = next.splice(sourceIndex, 1);
+      next.splice(targetIndex, 0, movingSection);
+      return next;
+    });
+  };
+
+  const clearDraftSections = () => {
+    setDraftSections([]);
+  };
+
+  const addDraftSetRow = () => {
+    setDraftSetRows((previous) => [
+      ...previous,
+      createDraftSetRow(draftExerciseKind),
+    ]);
+  };
+
+  const removeDraftSetRow = (setId: string) => {
+    setDraftSetRows((previous) => {
+      if (previous.length <= 1) {
+        return previous;
+      }
+
+      return previous.filter((row) => row.id !== setId);
+    });
+  };
+
+  const updateDraftSetRow = (
+    setId: string,
+    patch: Partial<DraftExerciseSet>,
+  ) => {
+    setDraftSetRows((previous) =>
+      previous.map((row) => (row.id === setId ? { ...row, ...patch } : row)),
+    );
+  };
+
+  const addDraftExercise = () => {
+    if (!draftExerciseName.trim() || !draftTargetSectionId) {
+      return;
+    }
+
+    const normalizedRows = draftSetRows.length
+      ? draftSetRows
+      : [createDraftSetRow(draftExerciseKind)];
+
+    const draftExercise: DraftExercise = {
+      id: createId(),
+      name: draftExerciseName.trim(),
+      kind: draftExerciseKind,
+      sets: normalizedRows.map((row) =>
+        draftExerciseKind === 'time'
+          ? {
+              id: createId(),
+              targetSec: Math.max(1, row.targetSec ?? 30),
+            }
+          : {
+              id: createId(),
+              loadKg: Math.max(0, row.loadKg ?? 0),
+              targetReps: Math.max(1, row.targetReps ?? 10),
+              rpe: Math.max(1, Math.min(10, row.rpe ?? 7)),
+            },
+      ),
+    };
+
+    setDraftSections((previous) =>
+      previous.map((section) =>
+        section.id === draftTargetSectionId
+          ? {
+              ...section,
+              exercises: [...section.exercises, draftExercise],
+            }
+          : section,
+      ),
+    );
+
     setDraftExerciseName('');
+    setDraftSetRows([createDraftSetRow(draftExerciseKind)]);
+  };
+
+  const removeDraftExercise = (sectionId: string, exerciseId: string) => {
+    setDraftSections((previous) =>
+      previous.map((section) => {
+        if (section.id !== sectionId) {
+          return section;
+        }
+
+        return {
+          ...section,
+          exercises: section.exercises.filter(
+            (exercise) => exercise.id !== exerciseId,
+          ),
+        };
+      }),
+    );
+  };
+
+  const updateDraftExercise = (
+    sectionId: string,
+    exerciseId: string,
+    patch: {
+      name?: string;
+      kind?: ExerciseKind;
+    },
+  ) => {
+    setDraftSections((previous) =>
+      previous.map((section) => {
+        if (section.id !== sectionId) {
+          return section;
+        }
+
+        return {
+          ...section,
+          exercises: section.exercises.map((exercise) => {
+            if (exercise.id !== exerciseId) {
+              return exercise;
+            }
+
+            const nextKind = patch.kind ?? exercise.kind;
+
+            return {
+              ...exercise,
+              name: patch.name ?? exercise.name,
+              kind: nextKind,
+              sets:
+                nextKind === exercise.kind
+                  ? exercise.sets
+                  : exercise.sets.map((setRow) =>
+                      createDraftSetRow(nextKind, setRow),
+                    ),
+            };
+          }),
+        };
+      }),
+    );
+  };
+
+  const moveDraftExercise = (
+    sourceSectionId: string,
+    targetSectionId: string,
+    exerciseId: string,
+    targetExerciseId?: string,
+  ) => {
+    setDraftSections((previous) => {
+      const sourceSection = previous.find(
+        (section) => section.id === sourceSectionId,
+      );
+      const targetSection = previous.find(
+        (section) => section.id === targetSectionId,
+      );
+
+      if (!sourceSection || !targetSection) {
+        return previous;
+      }
+
+      const sourceExercise = sourceSection.exercises.find(
+        (exercise) => exercise.id === exerciseId,
+      );
+
+      if (!sourceExercise) {
+        return previous;
+      }
+
+      if (
+        sourceSectionId === targetSectionId &&
+        (!targetExerciseId || targetExerciseId === exerciseId)
+      ) {
+        return previous;
+      }
+
+      return previous.map((section) => {
+        if (section.id === sourceSectionId && section.id === targetSectionId) {
+          const withoutMoving = section.exercises.filter(
+            (exercise) => exercise.id !== exerciseId,
+          );
+
+          const insertIndex = targetExerciseId
+            ? withoutMoving.findIndex(
+                (exercise) => exercise.id === targetExerciseId,
+              )
+            : withoutMoving.length;
+
+          const safeInsertIndex =
+            insertIndex < 0 ? withoutMoving.length : insertIndex;
+          const nextExercises = [...withoutMoving];
+          nextExercises.splice(safeInsertIndex, 0, sourceExercise);
+
+          return {
+            ...section,
+            exercises: nextExercises,
+          };
+        }
+
+        if (section.id === sourceSectionId) {
+          return {
+            ...section,
+            exercises: section.exercises.filter(
+              (exercise) => exercise.id !== exerciseId,
+            ),
+          };
+        }
+
+        if (section.id === targetSectionId) {
+          const insertIndex = targetExerciseId
+            ? section.exercises.findIndex(
+                (exercise) => exercise.id === targetExerciseId,
+              )
+            : section.exercises.length;
+
+          const safeInsertIndex =
+            insertIndex < 0 ? section.exercises.length : insertIndex;
+          const nextExercises = [...section.exercises];
+          nextExercises.splice(safeInsertIndex, 0, sourceExercise);
+
+          return {
+            ...section,
+            exercises: nextExercises,
+          };
+        }
+
+        return section;
+      });
+    });
+  };
+
+  const addSetToExercise = (sectionId: string, exerciseId: string) => {
+    setDraftSections((previous) =>
+      previous.map((section) => {
+        if (section.id !== sectionId) {
+          return section;
+        }
+
+        return {
+          ...section,
+          exercises: section.exercises.map((exercise) => {
+            if (exercise.id !== exerciseId) {
+              return exercise;
+            }
+
+            const lastSet = exercise.sets[exercise.sets.length - 1];
+
+            return {
+              ...exercise,
+              sets: [
+                ...exercise.sets,
+                createDraftSetRow(exercise.kind, lastSet),
+              ],
+            };
+          }),
+        };
+      }),
+    );
+  };
+
+  const updateExerciseSet = (
+    sectionId: string,
+    exerciseId: string,
+    setId: string,
+    patch: Partial<DraftExerciseSet>,
+  ) => {
+    setDraftSections((previous) =>
+      previous.map((section) => {
+        if (section.id !== sectionId) {
+          return section;
+        }
+
+        return {
+          ...section,
+          exercises: section.exercises.map((exercise) => {
+            if (exercise.id !== exerciseId) {
+              return exercise;
+            }
+
+            return {
+              ...exercise,
+              sets: exercise.sets.map((setRow) =>
+                setRow.id === setId ? { ...setRow, ...patch } : setRow,
+              ),
+            };
+          }),
+        };
+      }),
+    );
+  };
+
+  const removeExerciseSet = (
+    sectionId: string,
+    exerciseId: string,
+    setId: string,
+  ) => {
+    setDraftSections((previous) =>
+      previous.map((section) => {
+        if (section.id !== sectionId) {
+          return section;
+        }
+
+        return {
+          ...section,
+          exercises: section.exercises.map((exercise) => {
+            if (exercise.id !== exerciseId || exercise.sets.length <= 1) {
+              return exercise;
+            }
+
+            return {
+              ...exercise,
+              sets: exercise.sets.filter((setRow) => setRow.id !== setId),
+            };
+          }),
+        };
+      }),
+    );
+  };
+
+  const createDraftSets = (exercise: DraftExercise) => {
+    if (exercise.kind === 'time') {
+      return exercise.sets.map((row) => ({
+        id: createId(),
+        kind: 'time' as const,
+        targetSec: Math.max(1, row.targetSec ?? 30),
+        done: false,
+      }));
+    }
+
+    return exercise.sets.map((row) => ({
+      id: createId(),
+      kind: 'load_reps' as const,
+      targetReps: Math.max(1, row.targetReps ?? 10),
+      loadKg: Math.max(0, row.loadKg ?? 0),
+      rpe: Math.max(1, Math.min(10, row.rpe ?? 7)),
+      done: false,
+    }));
+  };
+
+  const buildDraftModelTemplate = (): WorkoutModelTemplate | null => {
+    const nonEmptySections = draftSections
+      .map((section) => ({
+        ...section,
+        exercises: section.exercises.filter(
+          (exercise) => exercise.name.trim().length > 0,
+        ),
+      }))
+      .filter((section) => section.exercises.length > 0);
+
+    if (!draftName.trim() || nonEmptySections.length === 0) {
+      return null;
+    }
+
+    return {
+      id: createId(),
+      name: draftName.trim(),
+      notes: draftNotes.trim() || undefined,
+      sections: nonEmptySections.map((section) => ({
+        id: createId(),
+        name: section.name.trim() || 'Main',
+        exercises: section.exercises.map((exercise) => ({
+          id: createId(),
+          name: exercise.name,
+          kind: exercise.kind,
+          sets: createDraftSets(exercise),
+        })),
+      })),
+      createdAt: new Date().toISOString(),
+      source: 'user',
+    };
+  };
+
+  const mapModelTemplateToStoreTemplate = (
+    modelTemplate: WorkoutModelTemplate,
+    options?: {
+      tags?: string[];
+      equipmentNeeded?: string[];
+      isUnilateral?: boolean;
+    },
+  ): WorkoutTemplate => {
+    return {
+      id: modelTemplate.id,
+      name: modelTemplate.name,
+      notes: modelTemplate.notes,
+      sourceType: 'manual',
+      version: 1,
+      tags: options?.tags ?? [],
+      equipmentNeeded: options?.equipmentNeeded ?? [],
+      isUnilateral: options?.isUnilateral ?? false,
+      sections: modelTemplate.sections.map((section, sectionIndex) => ({
+        id: section.id,
+        name: section.name,
+        notes: '',
+        order: sectionIndex + 1,
+        exercises: section.exercises.map((exercise) => ({
+          id: exercise.id,
+          name: exercise.name,
+          notes: '',
+          metricType: exercise.kind,
+          restPolicySec: exercise.kind === 'time' ? 60 : 120,
+          setPlans: exercise.sets.map((set, setIndex) => ({
+            id: createId(),
+            order: setIndex + 1,
+            targetKg:
+              set.kind === 'load_reps' ? (set.loadKg ?? undefined) : undefined,
+            targetReps:
+              set.kind === 'load_reps'
+                ? (set.targetReps ?? undefined)
+                : undefined,
+            targetDurationSec: set.kind === 'time' ? set.targetSec : undefined,
+            rpeTarget:
+              set.kind === 'load_reps' ? (set.rpe ?? undefined) : undefined,
+            notes: '',
+          })),
+        })),
+      })),
+    };
+  };
+
+  const editPlannedWorkout = () => {
+    if (!selectedTemplate || selectedSession) {
+      return;
+    }
+
+    const draftSectionsFromTemplate: DraftSection[] =
+      selectedTemplate.sections.map((section) => ({
+        id: createId(),
+        name: section.name,
+        exercises: section.exercises.map((exercise) => {
+          const firstSet = exercise.setPlans[0];
+
+          return {
+            id: createId(),
+            name: exercise.name,
+            kind: exercise.metricType,
+            sets: exercise.setPlans.length
+              ? exercise.setPlans.map((setPlan) => ({
+                  id: createId(),
+                  targetReps: setPlan.targetReps,
+                  loadKg: setPlan.targetKg,
+                  rpe: setPlan.rpeTarget,
+                  targetSec: setPlan.targetDurationSec,
+                }))
+              : [
+                  {
+                    id: createId(),
+                    targetReps: firstSet?.targetReps,
+                    loadKg: firstSet?.targetKg,
+                    rpe: firstSet?.rpeTarget,
+                    targetSec: firstSet?.targetDurationSec,
+                  },
+                ],
+          };
+        }),
+      }));
+
+    const firstDraftSection = draftSectionsFromTemplate[0];
+    const firstDraftExercise = firstDraftSection?.exercises[0];
+
+    setDraftName(selectedTemplate.name);
+    setDraftNotes(selectedTemplate.notes ?? '');
+    setDraftSectionName(firstDraftSection?.name ?? 'Main');
+    setDraftTargetSectionId(firstDraftSection?.id ?? '');
+    setDraftExerciseName('');
+    setDraftExerciseKind(firstDraftExercise?.kind ?? 'load_reps');
+    setDraftSetRows(
+      firstDraftExercise?.sets?.length
+        ? firstDraftExercise.sets.map((row) => ({ ...row, id: createId() }))
+        : [createDraftSetRow(firstDraftExercise?.kind ?? 'load_reps')],
+    );
+    setDraftSections(draftSectionsFromTemplate);
+    setMode('edit');
   };
 
   const createTemplateFromDraft = () => {
-    if (!draftName.trim() || draftExercises.length === 0) {
+    const modelTemplate = buildDraftModelTemplate();
+    if (!modelTemplate) {
       return;
     }
 
-    const template: WorkoutTemplate = {
-      id: createId(),
-      name: draftName.trim(),
-      notes: draftNotes.trim(),
-      sourceType: 'manual',
-      version: 1,
-      tags: [],
-      equipmentNeeded: [],
-      isUnilateral: false,
-      sections: [
-        {
-          id: createId(),
-          name: 'Main',
-          notes: '',
-          order: 1,
-          exercises: draftExercises.map((exercise) => ({
-            id: createId(),
-            name: exercise.name,
-            notes: '',
-            metricType: exercise.metricType,
-            restPolicySec: exercise.metricType === 'time' ? 60 : 120,
-            setPlans: createDefaultSetPlans(exercise.metricType),
-          })),
-        },
-      ],
-    };
+    const template = mapModelTemplateToStoreTemplate(modelTemplate);
 
     setStore((previous) => ({
       ...previous,
@@ -153,8 +705,62 @@ export const useWorkoutState = () => {
 
     setDraftName('');
     setDraftNotes('');
-    setDraftExercises([]);
+    setDraftSectionName('Main');
+    setDraftTargetSectionId('');
+    setDraftExerciseName('');
+    setDraftSetRows([createDraftSetRow('load_reps')]);
+    setDraftSections([]);
     setMode('none');
+    setFeedbackToast('Allenamento programmato modificato');
+  };
+
+  const saveEditedPlannedWorkout = () => {
+    if (!selectedTemplate) {
+      return;
+    }
+
+    const modelTemplate = buildDraftModelTemplate();
+    if (!modelTemplate) {
+      return;
+    }
+
+    const updatedTemplate = mapModelTemplateToStoreTemplate(modelTemplate, {
+      tags: [...selectedTemplate.tags],
+      equipmentNeeded: [...selectedTemplate.equipmentNeeded],
+      isUnilateral: selectedTemplate.isUnilateral,
+    });
+
+    setStore((previous) => ({
+      ...previous,
+      templates: [updatedTemplate, ...previous.templates],
+      dayPlans: [
+        ...previous.dayPlans.filter((dayPlan) => dayPlan.date !== selectedDate),
+        { date: selectedDate, templateId: updatedTemplate.id },
+      ],
+    }));
+
+    setDraftName('');
+    setDraftNotes('');
+    setDraftSectionName('Main');
+    setDraftTargetSectionId('');
+    setDraftExerciseName('');
+    setDraftSetRows([createDraftSetRow('load_reps')]);
+    setDraftSections([]);
+    setMode('none');
+  };
+
+  const deletePlannedWorkout = () => {
+    if (selectedSession?.status === 'in_progress') {
+      return;
+    }
+
+    setStore((previous) => ({
+      ...previous,
+      dayPlans: previous.dayPlans.filter(
+        (dayPlan) => dayPlan.date !== selectedDate,
+      ),
+    }));
+    setFeedbackToast('Allenamento programmato eliminato');
   };
 
   const copyFromTemplate = (template: WorkoutTemplate) => {
@@ -525,13 +1131,34 @@ export const useWorkoutState = () => {
     setDraftName,
     draftNotes,
     setDraftNotes,
+    draftSectionName,
+    setDraftSectionName,
+    draftTargetSectionId,
+    setDraftTargetSectionId,
+    draftSections,
+    addDraftSection,
+    updateDraftSection,
+    moveDraftSection,
+    removeDraftSection,
+    clearDraftSections,
     draftExerciseName,
     setDraftExerciseName,
-    draftMetricType,
-    setDraftMetricType,
-    draftExercises,
+    draftExerciseKind,
+    setDraftExerciseKind,
+    draftSetRows,
+    addDraftSetRow,
+    removeDraftSetRow,
+    updateDraftSetRow,
     addDraftExercise,
+    updateDraftExercise,
+    moveDraftExercise,
+    removeDraftExercise,
+    addSetToExercise,
+    updateExerciseSet,
+    removeExerciseSet,
+    editPlannedWorkout,
     createTemplateFromDraft,
+    saveEditedPlannedWorkout,
     copyFromTemplate,
     copyFromSession,
     startSession,
@@ -539,6 +1166,7 @@ export const useWorkoutState = () => {
     toggleSetDone,
     completeSession,
     deleteCompletedSession,
+    deletePlannedWorkout,
     restoreDeletedSession,
     saveSessionAsTemplate,
     restTimerSec,
@@ -548,6 +1176,7 @@ export const useWorkoutState = () => {
     resetRestTimer,
     assistantVisible,
     setAssistantVisible,
+    feedbackToast,
   };
 };
 
