@@ -1,4 +1,4 @@
-import { toDateKey } from '../lib/date';
+import { formatDayMonthShort, toDateKey } from '../lib/date';
 import type { WorkoutState } from '../hooks/use-workout-state';
 import styles from '../styles/page.module.scss';
 
@@ -33,15 +33,8 @@ export function WeeklyNavigator({
           ‹
         </button>
         <p className={styles.weekRangeLabel}>
-          {weekDays[0].toLocaleDateString('it-IT', {
-            day: '2-digit',
-            month: 'short',
-          })}{' '}
-          -{' '}
-          {weekDays[6].toLocaleDateString('it-IT', {
-            day: '2-digit',
-            month: 'short',
-          })}
+          {formatDayMonthShort(weekDays[0])} -{' '}
+          {formatDayMonthShort(weekDays[6])}
         </p>
         <button
           type='button'

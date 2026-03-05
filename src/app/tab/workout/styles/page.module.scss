@@ -621,7 +621,10 @@
 .undoToast {
   position: fixed;
   left: 50%;
-  bottom: 88px;
+
+  bottom: 20vh;
+  bottom: 20dvh;
+
   transform: translateX(-50%);
   z-index: 130;
   width: min(calc(100% - 24px), 420px);

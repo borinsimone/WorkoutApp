@@ -1,5 +1,45 @@
 export const weekdayLabels = ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'];
 
+const weekdayNames = [
+  'domenica',
+  'lunedì',
+  'martedì',
+  'mercoledì',
+  'giovedì',
+  'venerdì',
+  'sabato',
+];
+
+const monthNames = [
+  'gennaio',
+  'febbraio',
+  'marzo',
+  'aprile',
+  'maggio',
+  'giugno',
+  'luglio',
+  'agosto',
+  'settembre',
+  'ottobre',
+  'novembre',
+  'dicembre',
+];
+
+const monthShortNames = [
+  'gen',
+  'feb',
+  'mar',
+  'apr',
+  'mag',
+  'giu',
+  'lug',
+  'ago',
+  'set',
+  'ott',
+  'nov',
+  'dic',
+];
+
 export const toDateKey = (date: Date) => {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -26,11 +66,16 @@ export const startOfWeek = (date: Date) => {
 
 export const formatDateLabel = (dateKey: string) => {
   const date = parseDateKey(dateKey);
-  return date.toLocaleDateString('it-IT', {
-    weekday: 'long',
-    day: '2-digit',
-    month: 'long',
-  });
+  const weekday = weekdayNames[date.getDay()];
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = monthNames[date.getMonth()];
+  return `${weekday} ${day} ${month}`;
+};
+
+export const formatDayMonthShort = (date: Date) => {
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = monthShortNames[date.getMonth()];
+  return `${day} ${month}`;
 };
 
 export const formatTimer = (seconds: number) => {
@@ -51,10 +96,9 @@ export const formatStartTime = (isoDate?: string) => {
     return '--:--';
   }
 
-  return date.toLocaleTimeString('it-IT', {
-    hour: '2-digit',
-    minute: '2-digit',
-  });
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  return `${hours}:${minutes}`;
 };
 
 export const formatDuration = (seconds: number) => {
